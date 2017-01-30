@@ -34,7 +34,7 @@ of ``TemporaryDirectory`` is closed.
 If ``dir`` is set, the temporary directory is created as a sub-directory
 of ``dir``.
 
-``TemporaryDirectory``
+``TemporaryFileOrDirectory``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Has the following attributes:
@@ -43,7 +43,7 @@ Has the following attributes:
 -  ``close()`` - delete the temporary directory, including any files and
    sub-directories
 
-``TemporaryDirectory`` is a context manager, so using ``with`` will also
+``TemporaryFileOrDirectory`` is a context manager, so using ``with`` will also
 delete the temporary directory.
 
 ``tempdir.root(dir, timeout=None)``
@@ -77,4 +77,3 @@ Installation
 .. code-block:: sh
 
     pip install tempman
-
