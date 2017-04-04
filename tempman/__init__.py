@@ -1,5 +1,6 @@
-import tempfile
+import glob
 import shutil
+import tempfile
 import time
 import os
 from numbers import Number
@@ -47,8 +48,15 @@ def root(dir, timeout=None):
 
 
 class Root(object):
+    _separator = '__'
+
+    def path(self):
+        return self._path
+
     def __init__(self, path, timeout):
         self._path = path
+        if not os.path.exists(path):
+            os.makedirs(path)
         if timeout is None or isinstance(timeout, Number):
             self._timeout = timeout
         else:
@@ -68,7 +76,34 @@ class Root(object):
     def create_temp_file(self, prefix, deleteonclose=False):
         self.cleanup()
 
-        return create_temp_file(dir=self._path, prefix=prefix, deleteonclose=deleteonclose)
+        return create_temp_file(dir=self._path, prefix=prefix + self._separator, deleteonclose=deleteonclose)
+
+    # make/get/exists convenience methods wrapping
+    # prefix style tempfile names
+    def make_file(self, name):
+        self.delete_file(name)
+        return self.create_temp_file(name).path
+
+    def get_file_path(self, name):
+        fname_prefix = os.path.join(self._path, name)
+        files = [f for f in glob.glob(fname_prefix + "*") if fname_prefix == f[:f.rindex('__')]]
+        print(files)
+        if len(files) > 0:
+            return files[0]
+
+    def delete_file(self, name):
+        fname_prefix = os.path.join(self._path, name)
+        files = [f for f in glob.glob(fname_prefix + "*") if fname_prefix == f[:f.rindex('__')]]
+        print(files)
+        if len(files) > 0:
+            for filename in glob.glob(files):
+                os.remove(filename)
+
+    def exists(self, name):
+        fname_prefix = os.path.join(self._path, name)
+        files = [f for f in glob.glob(fname_prefix + "*") if fname_prefix == f[:f.rindex('__')]]
+        print(files)
+        return len(files) > 0
 
     def cleanup(self):
         if self._timeout is not None:
